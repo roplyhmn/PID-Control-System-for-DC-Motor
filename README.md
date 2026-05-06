@@ -1,4 +1,4 @@
-# PID-Control-System-for-DC-Motor
+# PID Control System for DC Motor
 
 ##Overview
 This project implements a closed-loop control system using PID (Proportional–Integral–Derivative) to control the position of a ball on a beam by adjusting the angle of a DC motor-driven mechanism.
