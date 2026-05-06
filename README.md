@@ -18,8 +18,8 @@ The system aims to maintain stability by minimizing the error between the desire
 The PID controller continuously adjusts the motor input to maintain system equilibrium.
 
 ## Tech Stack
-- Embedded C / C++
-- Microcontroller (Arduino / STM32 – adjust based on your implementation)
+- Embedded C
+- Microcontroller (Arduino)
 - Control System (PID Algorithm)
 - Motor Driver & DC Motor
 
