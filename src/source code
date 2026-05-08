@@ -1,0 +1,88 @@
+#include <Servo.h>
+Servo servo;
+#define trig 2
+#define echo 3
+#define kp 25
+#define ki 0.01
+#define kd 20
+double priError = 0;
+double toError = 0;
+int servoCenter = 70;
+
+void setup() {
+ pinMode(trig, OUTPUT);
+ pinMode(echo, INPUT);
+ servo.attach(5);
+ Serial.begin(9600);
+
+ delay(100);
+ servo.write(servoCenter);
+}
+
+void loop() {
+ PID();
+ delay(50);
+}
+
+long distance() {
+ digitalWrite(trig, LOW);
+ delayMicroseconds(4);
+ digitalWrite(trig, HIGH);
+ delayMicroseconds(15);
+ digitalWrite(trig, LOW);
+ long t = pulseIn(echo, HIGH, 40000);
+
+ if (t <= 0) {
+   return -1;
+ }
+ long cm = t * 0.034 / 2;
+ if (cm > 400 || cm < 0) {
+   return -1;
+ }
+ return cm;
+}
+
+void PID() {
+ long dis = distance();
+
+ if (dis < 0) {
+ Serial.println("Sensor error");
+ servo.write(servoCenter);
+ priError = 0;
+ toError = 0;
+ return;
+ }
+ 
+ static long lastValidDis = 15;
+ if (dis < 2 || dis > 200) {
+ dis = lastValidDis;
+ } else {
+ lastValidDis = dis;
+ }
+ 
+ int setP = 12;
+ int error = setP - dis;
+ double Pvalue = error * kp;
+ double Ivalue = toError * ki;
+
+ if (toError > 1000) toError = 1000;
+ if (toError < -1000) toError = -1000;
+
+ double Dvalue = (error - priError) * kd;
+ double PIDvalue = Pvalue + Ivalue + Dvalue;
+ priError = error;
+ toError += error;
+ int Fvalue = constrain((int)PIDvalue, -25, 25);
+ int servoPos = servoCenter - Fvalue;
+ servoPos = constrain(servoPos, 45, 105);
+ servo.write(servoPos);
+ Serial.print("Jarak: ");
+ Serial.print(dis);
+ Serial.print("cm | Error: ");
+ Serial.print(error);
+ Serial.print(" | Servo: ");
+ Serial.print(servoPos);
+ Serial.print(" | PID: ");
+ Serial.println(PIDvalue);
+}
+
